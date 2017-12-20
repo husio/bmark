@@ -1,0 +1,13 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "klnQuD082Kx6KvI+vXOhPS7xaRM=",
+			"path": "github.com/husio/envconf",
+			"revision": "0bdd76fdadcf53f360fd3af6f2c444d53823769e",
+			"revisionTime": "2016-08-23T15:44:34Z"
+		}
+	],
+	"rootPath": "github.com/husio/bmark"
+}
