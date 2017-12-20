@@ -59,7 +59,7 @@ func main() {
 
 type configuration struct {
 	MercuryApiKey string
-	HTTPPort      int `envconf:"PORT"`
-	Postgres      string
+	HTTPPort      int    `envconf:"PORT"`
+	Postgres      string `envconf:"DATABASE_URL"`
 	SecretKey     string
 }
