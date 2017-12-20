@@ -5,25 +5,65 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/husio/bmark/pkg/surf"
 )
 
-func LatestPageHandler(
+func PagesListHandler(
 	store PageStore,
 	rend surf.Renderer,
 ) http.HandlerFunc {
+	const pageSize = 25
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		switch page, err := store.LatestPage(r.Context()); {
-		case err == nil:
-			http.Redirect(w, r, fmt.Sprintf("/p/%d/", page.PageID), http.StatusSeeOther)
-		case IsNotFound(err):
-			rend.RenderStdResponse(w, http.StatusNotFound)
-		default:
-			surf.Error(r.Context(), err, "cannot get latest page")
+		ctx := r.Context()
+
+		createdLte := time.Now()
+		if t, ok := parseTime(r.URL.Query().Get("olderThan")); ok {
+			createdLte = t
+		}
+
+		pages, err := store.ListPages(ctx, pageSize, createdLte)
+		if err != nil {
+			surf.Error(ctx, err, "cannot list pages")
 			rend.RenderStdResponse(w, http.StatusInternalServerError)
+			return
+		}
+
+		var next *time.Time
+		if len(pages) == pageSize {
+			next = &pages[pageSize-1].CreatedAt
+		}
+
+		rend.RenderResponse(w, http.StatusOK, "pages_list.tmpl", struct {
+			CreatedLte time.Time
+			Next       *time.Time
+			Pages      []*Page
+		}{
+			CreatedLte: createdLte,
+			Next:       next,
+			Pages:      pages,
+		})
+	}
+}
+
+func parseTime(raw string) (time.Time, bool) {
+	for _, format := range timeFormats {
+		if t, err := time.Parse(format, raw); err == nil {
+			return t, true
 		}
 	}
+	return time.Time{}, false
+}
+
+var timeFormats = []string{
+	time.RFC3339,
+	time.RFC3339Nano,
+	"2006-01-02T150405",
+	"2006-01-02T15:04:05",
+	"2006-01-02T15:04",
+	"2006-01-02",
 }
 
 func PageHandler(

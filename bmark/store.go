@@ -15,7 +15,7 @@ type Page struct {
 }
 
 type PageStore interface {
-	LatestPage(ctx context.Context) (*Page, error)
+	ListPages(ctx context.Context, limit int, createdLte time.Time) ([]*Page, error)
 	AddPage(ctx context.Context, url, title, content string) (int64, error)
 	DelPage(ctx context.Context, pageID int64) error
 	PageWithSurrounding(ctx context.Context, pageID int64) (prev, current, next *Page, err error)

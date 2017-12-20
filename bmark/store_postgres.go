@@ -35,7 +35,7 @@ func (s *pgPageStore) ensureSchema() error {
 
 func (s *pgPageStore) AddPage(ctx context.Context, url, title, content string) (int64, error) {
 	var pageID int64
-	err := s.db.QueryRow(`
+	err := s.db.QueryRowContext(ctx, `
 		INSERT INTO pages (url, title, content, created_at)
 		VALUES ($1, $2, $3, $4)
 		RETURNING page_id
@@ -119,20 +119,27 @@ func (s *pgPageStore) PageWithSurrounding(ctx context.Context, pageID int64) (*P
 	return prev, current, next, nil
 }
 
-func (s *pgPageStore) LatestPage(ctx context.Context) (*Page, error) {
-	var page Page
-	err := s.db.QueryRow(`
+func (s *pgPageStore) ListPages(ctx context.Context, limit int, createdLte time.Time) ([]*Page, error) {
+	rows, err := s.db.QueryContext(ctx, `
 		SELECT page_id, url, title, created_at
 		FROM pages
+		WHERE created_at <= $1
 		ORDER BY created_at DESC
-		LIMIT 1
-	`).Scan(&page.PageID, &page.URL, &page.Title, &page.CreatedAt)
-	switch {
-	case err == nil:
-		return &page, nil
-	case err == sql.ErrNoRows:
-		return nil, ErrNotFound("no pages")
-	default:
-		return nil, err
+		LIMIT $2
+	`, createdLte, limit)
+	if err != nil {
+		return nil, fmt.Errorf("cannot query pages: %s", err)
 	}
+	defer rows.Close()
+
+	pages := make([]*Page, 0, limit)
+	for rows.Next() {
+		var p Page
+		if err := rows.Scan(&p.PageID, &p.URL, &p.Title, &p.CreatedAt); err != nil {
+			rows.Close()
+			return pages, fmt.Errorf("cannot scan page: %s", err)
+		}
+		pages = append(pages, &p)
+	}
+	return pages, rows.Close()
 }

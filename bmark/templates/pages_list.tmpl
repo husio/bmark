@@ -1,0 +1,32 @@
+<!doctype html>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+html, body { padding: 0; margin: 0; }
+body { color: #191919; margin: 20px; }
+.listing {}
+.listing table { width: 100%;}
+.nextpage { text-align: center; }
+.nextpage a { text-decoration: none; border: 1px solid #272727; padding: 4px 10px; background: #DADADA; border-radius: 4px; color: #000; box-shadow:inset 0px 0px 0px 1px #fff; }
+</style>
+
+<body>
+  <div class="listing">
+    <table>
+    <tbody>
+    {{range .Pages}}
+      <tr>
+        <td><a href="/p/{{.PageID}}/">{{.Title}}</a></td>
+        <td>{{.CreatedAt.Format "Mon, 02/01/2006"}}</td>
+      </tr>
+    {{end}}
+    </tbody>
+    </table>
+  </div>
+
+  {{if .Next}}
+    <div class="nextpage">
+        <a href="/?olderThan={{.Next.Format "2006-01-02T150405"}}">Next page</a>
+    </div>
+  {{end}}
+</body>

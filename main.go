@@ -43,7 +43,7 @@ func main() {
 	})
 
 	rt := surf.NewRouter()
-	rt.Get(`/`, bmark.LatestPageHandler(pageStore, rend))
+	rt.Get(`/`, bmark.PagesListHandler(pageStore, rend))
 	rt.Get(`/p/<page-id:\d+>/`, bmark.PageHandler(pageStore, rend))
 	rt.Any(`/add/`, bmark.AddPageHandler(pageStore, articles, conf.SecretKey, rend))
 
