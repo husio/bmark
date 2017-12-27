@@ -7,6 +7,9 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"regexp"
+	"strings"
+	"time"
 
 	"github.com/husio/bmark/bmark"
 	"github.com/husio/bmark/pkg/surf"
@@ -37,6 +40,8 @@ func main() {
 	articles := bmark.NewMercuryArticleService(conf.MercuryApiKey)
 
 	rend := surf.NewHTMLRenderer("**/templates/**.tmpl", template.FuncMap{
+		"timeago": timeago,
+		"slugify": slugify,
 		"safehtml": func(s string) template.HTML {
 			return template.HTML(s)
 		},
@@ -44,7 +49,7 @@ func main() {
 
 	rt := surf.NewRouter()
 	rt.Get(`/`, bmark.PagesListHandler(pageStore, rend))
-	rt.Get(`/p/<page-id:\d+>/`, bmark.PageHandler(pageStore, rend))
+	rt.Get(`/p<page-id:\d+>/.*`, bmark.PageHandler(pageStore, rend))
 	rt.Any(`/add/`, bmark.AddPageHandler(pageStore, articles, conf.SecretKey, rend))
 
 	app := surf.NewHTTPApplication(rt, false, logger)
@@ -63,3 +68,35 @@ type configuration struct {
 	Postgres      string `envconf:"DATABASE_URL"`
 	SecretKey     string
 }
+
+func timeago(t time.Time) string {
+	d := time.Now().Sub(t)
+	if d > 24*time.Hour {
+		days := int(d / (24 * time.Hour))
+		if days == 1 {
+			return "1 day"
+		}
+		return fmt.Sprintf("%d days", days)
+	}
+	if d > time.Hour {
+		hours := int(d / time.Hour)
+		if hours == 1 {
+			return "1 hour"
+		}
+		return fmt.Sprintf("%d hours", hours)
+	}
+	if d > time.Minute {
+		mins := int(d / time.Minute)
+		if mins == 1 {
+			return "1 minute"
+		}
+		return fmt.Sprintf("%d minutes", mins)
+	}
+	return "just now"
+}
+
+func slugify(s string) string {
+	return strings.Trim(slugifyrx.ReplaceAllString(strings.ToLower(s), "-"), "-")
+}
+
+var slugifyrx = regexp.MustCompile("[^a-z0-9]+")

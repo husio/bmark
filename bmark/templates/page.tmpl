@@ -2,36 +2,31 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-html, body { padding: 0; margin: 0; overflow-x: hidden; }
-body { color: #191919; background: #ECECEC; margin: 10px 0 60px 0; }
+{{template "core_css.tmpl"}}
 h1 { text-align: center; }
 .navigation .item { padding: 5px; display: inline-block; font-size: 20px; max-width: 44%; }
 .navigation .item a { text-decoration: none !important; color: #000; text-weight: bolld; }
+.navigation .item a:hover { text-decoration: underline !important; }
 .navigation .go-next { left: 5px; }
 .navigation .go-prev { right: 5px; float: right; text-align: right;  }
-.page { padding: 10px; background: #fff; border: 1px solid #ddd; }
-.page a.original-url { text-decoration: none !important; font-size: 12px; color: #B9B9B9; }
-.page { max-width: 100%; }
-.page pre { max-width: 100%; white-space: pre-wrap; }
-.page img { max-width: 80%; margin: auto; display: block; }
 </style>
 
 <body>
   <div class="navigation">
     <div class="item go-prev">
       {{if .PrevPage}}
-        <a href="/p/{{.PrevPage.PageID}}/">{{.PrevPage.Title}} ▶</a>
+        <a href="/p{{.PrevPage.PageID}}/{{slugify .PrevPage.Title}}">{{.PrevPage.Title}} ▶</a>
       {{end}}
     </div>
     <div class="item go-next">
       {{if .NextPage}}
-        <a href="/p/{{.NextPage.PageID}}/">◀ {{.NextPage.Title}}</a>
+        <a href="/p{{.NextPage.PageID}}/{{slugify .NextPage.Title}}">◀ {{.NextPage.Title}}</a>
       {{end}}
     </div>
     <div style="clear:both;"></div>
   </div>
 
-  <div class="page">
+  <div class="content">
     <h1 title="Fetched {{.Page.CreatedAt}}">
       {{.Page.Title}}&nbsp;<a class="original-url" href="{{.Page.URL}}" title="Article's original URL">url</a>
     </h1>
@@ -41,12 +36,12 @@ h1 { text-align: center; }
   <div class="navigation">
     <div class="item go-prev">
       {{if .PrevPage}}
-        <a href="/p/{{.PrevPage.PageID}}/">{{.PrevPage.Title}} ▶</a>
+        <a href="/p{{.PrevPage.PageID}}/{{slugify .PrevPage.Title}}">{{.PrevPage.Title}}&nbsp;▶</a>
       {{end}}
     </div>
     <div class="item go-next">
       {{if .NextPage}}
-        <a href="/p/{{.NextPage.PageID}}/">◀ {{.NextPage.Title}}</a>
+        <a href="/p{{.NextPage.PageID}}/{{slugify .NextPage.Title}}">◀&nbsp;{{.NextPage.Title}}</a>
       {{end}}
     </div>
     <div style="clear:both;"></div>

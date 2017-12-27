@@ -2,8 +2,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-html, body { padding: 0; margin: 0; }
-body { color: #191919; margin: 20px; }
+{{template "core_css.tmpl"}}
 .listing {}
 .listing table { width: 100%;}
 .nextpage { text-align: center; }
@@ -11,17 +10,27 @@ body { color: #191919; margin: 20px; }
 </style>
 
 <body>
-  <div class="listing">
-    <table>
-    <tbody>
-    {{range .Pages}}
-      <tr>
-        <td><a href="/p/{{.PageID}}/">{{.Title}}</a></td>
-        <td>{{.CreatedAt.Format "Mon, 02/01/2006"}}</td>
-      </tr>
-    {{end}}
-    </tbody>
-    </table>
+<div class="content">
+  {{if .Pages}}
+    <div class="listing">
+      <table>
+      <tbody>
+      {{range .Pages}}
+        <tr>
+          <td><a href="/p{{.PageID}}/{{slugify .Title}}">{{.Title}}</a></td>
+          <td title="{{.CreatedAt}}">{{timeago .CreatedAt}} ago</td>
+        </tr>
+      {{end}}
+      </tbody>
+      </table>
+  {{else}}
+    No entries. Add some using <code>curl</code>, for example:
+    <pre>
+    <code>
+$ curl http://localhost:8000/add/ -d "url=http://antirez.com/news/115"
+    </code>
+    </pre>
+  {{end}}
   </div>
 
   {{if .Next}}
@@ -29,4 +38,5 @@ body { color: #191919; margin: 20px; }
         <a href="/?olderThan={{.Next.Format "2006-01-02T150405"}}">Next page</a>
     </div>
   {{end}}
+</div>
 </body>
