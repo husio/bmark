@@ -3,9 +3,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 {{template "core_css.tmpl"}}
-body { font-size: 110%; }
 .listing table { width: 100%;}
 .nextpage { text-align: center; margin-top: 50px; }
+.small { font-size: 80%; }
 </style>
 
 <body>
@@ -17,7 +17,7 @@ body { font-size: 110%; }
       {{range .Pages}}
         <tr>
           <td><a href="/p{{.PageID}}/{{slugify .Title}}" title="{{.URL}}">{{.Title}}</a></td>
-          <td title="{{.CreatedAt}}">{{timeago .CreatedAt}} ago</td>
+          <td title="{{.CreatedAt}}" class="small">{{timeago .CreatedAt}} ago</td>
         </tr>
       {{end}}
       </tbody>
