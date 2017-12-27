@@ -3,21 +3,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 {{template "core_css.tmpl"}}
-.listing {}
+body { font-size: 110%; }
 .listing table { width: 100%;}
-.nextpage { text-align: center; }
-.nextpage a { text-decoration: none; border: 1px solid #272727; padding: 4px 10px; background: #DADADA; border-radius: 4px; color: #000; box-shadow:inset 0px 0px 0px 1px #fff; }
+.nextpage { text-align: center; margin-top: 50px; }
 </style>
 
 <body>
-<div class="content">
+<div class="bmark-content">
   {{if .Pages}}
     <div class="listing">
       <table>
       <tbody>
       {{range .Pages}}
         <tr>
-          <td><a href="/p{{.PageID}}/{{slugify .Title}}">{{.Title}}</a></td>
+          <td><a href="/p{{.PageID}}/{{slugify .Title}}" title="{{.URL}}">{{.Title}}</a></td>
           <td title="{{.CreatedAt}}">{{timeago .CreatedAt}} ago</td>
         </tr>
       {{end}}
@@ -35,7 +34,7 @@ $ curl http://localhost:8000/add/ -d "url=http://antirez.com/news/115"
 
   {{if .Next}}
     <div class="nextpage">
-        <a href="/?olderThan={{.Next.Format "2006-01-02T150405"}}">Next page</a>
+        <a href="/?olderThan={{.Next.Format "2006-01-02T150405"}}">load next page ►</a>
     </div>
   {{end}}
 </div>
